@@ -33,7 +33,7 @@ async function discoverEndpointFromHtml(url: string): Promise<string | null> {
 
     try {
         console.log("hej")
-      await page.goto(url, { waitUntil: 'networkidle2' });
+      await page.goto(url);
   
       const oembedLink = await page.evaluate(() => {
         const link = document.querySelector(
