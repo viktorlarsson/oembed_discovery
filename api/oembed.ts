@@ -1,33 +1,54 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import puppeteerCore from "puppeteer-core";
+import puppeteer from "puppeteer";
+import chromium from "@sparticuz/chromium";
 
 import fetch from 'node-fetch';
 import { JSDOM } from 'jsdom';
 import { OEmbedResponse } from '../src/types/oembed';
 
-async function discoverEndpointFromHtml(url: string): Promise<string | null> {
-  try {
-    const response = await fetch(url);
+export const dynamic = "force-dynamic";
 
-    console.log(response)
-    if (!response.ok) {
-      throw new Error(`Failed to fetch HTML: ${response.statusText}`);
-    }
-    
-    const html = await response.text();
-    console.log(html)
-    const dom = new JSDOM(html);
-    const document = dom.window.document;
+async function getBrowser() {
+  if (process.env.VERCEL_ENV === "production") {
+    const executablePath = await chromium.executablePath();
 
-    const oembedLink = document.querySelector(
-        'link[rel="alternate"][type="application/json+oembed"], link[rel="alternate"][type="text/xml+oembed"]'
-      );
-
-    return oembedLink?.getAttribute('href') || null;
-  } catch (error) {
-    console.error('Error parsing HTML:', error);
-    return null;
+    const browser = await puppeteerCore.launch({
+      args: chromium.args,
+      defaultViewport: chromium.defaultViewport,
+      executablePath,
+      headless: chromium.headless,
+    });
+    return browser;
+  } else {
+    const browser = await puppeteer.launch();
+    return browser;
   }
 }
+
+
+async function discoverEndpointFromHtml(url: string): Promise<string | null> {
+    const browser = await getBrowser();
+    const page = await browser.newPage();
+  
+    try {
+      await page.goto(url, { waitUntil: 'networkidle2' });
+  
+      const oembedLink = await page.evaluate(() => {
+        const link = document.querySelector(
+          'link[rel="alternate"][type="application/json+oembed"], link[rel="alternate"][type="text/xml+oembed"]'
+        );
+        return link ? link.getAttribute('href') : null;
+      });
+  
+      return oembedLink;
+    } catch (error) {
+      console.error('Error parsing HTML:', error);
+      return null;
+    } finally {
+      await browser.close();
+    }
+  }
 
 async function discoverOembedData(url: string): Promise<OEmbedResponse> {
   try {
