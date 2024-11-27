@@ -1,19 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { discoverOembedData } from '../src/server/oembedService';
 
-async function discoverOembedData(url: string) {
-  try {
-    const response = await fetch(url, { method: 'GET' });
-    if (!response.ok) {
-      throw new Error('Failed to fetch oEmbed data');
-    }
-
-    // Extract the oEmbed data from the response (you might need to adjust parsing based on response structure)
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    throw new Error('No oEmbed data found or invalid URL');
-  }
-}
 
 export default async function handler(
   request: VercelRequest,
