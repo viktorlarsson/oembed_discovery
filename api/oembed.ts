@@ -44,6 +44,14 @@ async function discoverEndpointFromHtml(url: string): Promise<string | null> {
         await page.setUserAgent(
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36"
         );
+        await page.setRequestInterception(true);
+        page.on("request", (req) => {
+            if (["image", "stylesheet", "font"].includes(req.resourceType())) {
+                req.abort();
+            } else {
+                req.continue();
+            }
+        });
         await page.setViewport({
             width: Math.floor(Math.random() * (1920 - 800) + 800),
             height: Math.floor(Math.random() * (1080 - 600) + 600),
