@@ -16,8 +16,8 @@ async function discoverEndpointFromHtml(url: string): Promise<string | null> {
     const document = dom.window.document;
 
     const oembedLink = document.querySelector(
-      'link[type="application/json+oembed"], link[type="text/json+oembed"]'
-    );
+        'link[rel="alternate"][type="application/json+oembed"], link[rel="alternate"][type="text/xml+oembed"]'
+      );
 
     return oembedLink?.getAttribute('href') || null;
   } catch (error) {
