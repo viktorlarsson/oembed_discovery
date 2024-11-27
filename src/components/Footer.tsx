@@ -20,15 +20,6 @@ export function Footer() {
           >
             oEmbed Spec
           </a>
-          <a
-            href="https://github.com/yourusername/oembed-discovery"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-1 text-blue-600 hover:underline"
-          >
-            <Github className="w-4 h-4" />
-            Source Code
-          </a>
         </div>
         <p>© {new Date().getFullYear()} oEmbed Discovery Tool. Made with ❤️ for the web community.</p>
       </div>
