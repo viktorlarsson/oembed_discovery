@@ -5,7 +5,7 @@
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "skipLibCheck": true,
-
+"allowSyntheticDefaultImports": true,
     /* Bundler mode */
     "allowImportingTsExtensions": true,
     "isolatedModules": true,

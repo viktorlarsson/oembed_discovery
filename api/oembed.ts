@@ -7,7 +7,6 @@ import fetch from 'node-fetch';
 import { JSDOM } from 'jsdom';
 import { OEmbedResponse } from '../src/types/oembed';
 
-export const dynamic = "force-dynamic";
 
 async function getBrowser() {
   if (process.env.VERCEL_ENV === "production") {
