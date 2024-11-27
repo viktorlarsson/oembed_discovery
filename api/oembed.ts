@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { discoverOembedData } from '../src/server/oembedService';
+import { discoverOembedData } from './oembedService';
 
 
 export default async function handler(
