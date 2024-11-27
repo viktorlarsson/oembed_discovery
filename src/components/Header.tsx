@@ -15,7 +15,7 @@ export function Header() {
       </p>
       <div className="mt-4 text-sm text-gray-500">
         <p>Simply paste a URL and get instant previews with technical details.</p>
-        <p>No API keys required • Free to usee</p>
+        <p>No API keys required • Free to use</p>
       </div>
       <nav className="mt-4">
         <Link 
