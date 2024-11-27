@@ -7,6 +7,8 @@ import { OEmbedResponse } from '../src/types/oembed';
 async function discoverEndpointFromHtml(url: string): Promise<string | null> {
   try {
     const response = await fetch(url);
+
+    console.log(response)
     if (!response.ok) {
       throw new Error(`Failed to fetch HTML: ${response.statusText}`);
     }
