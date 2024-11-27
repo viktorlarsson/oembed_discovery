@@ -24,7 +24,7 @@ export function PreviewCard({ data }: PreviewCardProps) {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-6 max-w-3xl w-full">
+    <div className="bg-white rounded-lg shadow-lg p-6 max-w-4xl w-full">
       <div className="flex items-center gap-3 mb-4">
         {getIcon()}
         <h2 className="text-xl font-semibold">{data.title || 'Untitled'}</h2>
