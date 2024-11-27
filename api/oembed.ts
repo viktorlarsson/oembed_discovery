@@ -1,34 +1,33 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import puppeteer from 'puppeteer';
 
 import fetch from 'node-fetch';
-//import { JSDOM } from 'jsdom';
+import { JSDOM } from 'jsdom';
 import { OEmbedResponse } from '../src/types/oembed';
 
-
 async function discoverEndpointFromHtml(url: string): Promise<string | null> {
-  const browser = await puppeteer.launch();
-  const page = await browser.newPage();
-
   try {
-    await page.goto(url, { waitUntil: 'networkidle2' });
+    const response = await fetch(url);
 
-    const oembedLink = await page.evaluate(() => {
-      const link = document.querySelector(
+    console.log(response)
+    if (!response.ok) {
+      throw new Error(`Failed to fetch HTML: ${response.statusText}`);
+    }
+    
+    const html = await response.text();
+    console.log(html)
+    const dom = new JSDOM(html);
+    const document = dom.window.document;
+
+    const oembedLink = document.querySelector(
         'link[rel="alternate"][type="application/json+oembed"], link[rel="alternate"][type="text/xml+oembed"]'
       );
-      return link ? link.getAttribute('href') : null;
-    });
 
-    return oembedLink;
+    return oembedLink?.getAttribute('href') || null;
   } catch (error) {
     console.error('Error parsing HTML:', error);
     return null;
-  } finally {
-    await browser.close();
   }
 }
-
 
 async function discoverOembedData(url: string): Promise<OEmbedResponse> {
   try {
