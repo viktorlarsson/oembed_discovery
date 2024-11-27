@@ -45,10 +45,11 @@ async function discoverOembedData(url: string): Promise<OEmbedResponse> {
     const response = await fetch(finalUrl.toString(), {
       headers: {
         'Accept': 'application/json',
-        'User-Agent': 'OEmbed Discovery Tool/1.0'
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36'
       }
     });
 
+    console.log(response)
     if (!response.ok) {
       const errorText = await response.text();
       throw new Error(`Failed to fetch oEmbed data: ${response.statusText} - ${errorText}`);
