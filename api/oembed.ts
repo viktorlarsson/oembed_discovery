@@ -4,7 +4,7 @@ export const config = {
    
 import { discoverOembedData } from "../src/server/oembedService";
 
-export default async (request) => {
+export default async (request: Request) => {
     try {
       const { searchParams } = new URL(request.url);
       const url = searchParams.get('url');
