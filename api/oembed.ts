@@ -1,4 +1,7 @@
-export const runtime = "edge"
+export const config = {
+    runtime: 'edge',
+  };
+   
 import { discoverOembedData } from "../src/server/oembedService";
 
    
