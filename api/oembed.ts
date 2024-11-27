@@ -14,6 +14,7 @@ async function discoverEndpointFromHtml(url: string): Promise<string | null> {
     }
     
     const html = await response.text();
+    console.log(html)
     const dom = new JSDOM(html);
     const document = dom.window.document;
 
