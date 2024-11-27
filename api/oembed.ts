@@ -69,6 +69,8 @@ export default async function handler(
   if (request.method !== 'GET') {
     return response.status(405).json({ error: 'Method not allowed' });
   }
+console.log("GETTING URL", request.query.url );
+console.log("GETTING URL", request.query )
 
   const url = request.query.url as string;
 
