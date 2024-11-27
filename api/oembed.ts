@@ -32,6 +32,10 @@ async function discoverEndpointFromHtml(url: string): Promise<string | null> {
         console.log("Navigating to URL...");
         await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 });
 
+        // Dump the HTML to a log
+        const html = await page.content();
+        console.log("PAGE HTML:", html);
+
         // Wait for the specific selector
         await page.waitForSelector('link[rel="alternate"][type="application/json+oembed"]', { timeout: 5000 });
 
@@ -45,7 +49,7 @@ async function discoverEndpointFromHtml(url: string): Promise<string | null> {
 
         return oembedLink;
     } catch (error) {
-        console.error('Error parsing HTML:', error);
+        console.log('Error parsing HTML:', error);
         return null;
     } finally {
         await browser.close();
