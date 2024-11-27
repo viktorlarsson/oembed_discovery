@@ -27,9 +27,12 @@ async function getBrowser() {
 
 async function discoverEndpointFromHtml(url: string): Promise<string | null> {
     const browser = await getBrowser();
+    console.log(browser)
     const page = await browser.newPage();
-  
+    console.log(page)
+
     try {
+        console.log("hej")
       await page.goto(url, { waitUntil: 'networkidle2' });
   
       const oembedLink = await page.evaluate(() => {
