@@ -1,6 +1,5 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import { discoverOembedData } from './src/server/oembedService';
 
 export default defineConfig({
   plugins: [
@@ -35,3 +34,7 @@ export default defineConfig({
     exclude: ['lucide-react'],
   },
 });
+
+function discoverOembedData(url: any) {
+    throw new Error('Function not implemented.');
+}
