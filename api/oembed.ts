@@ -24,32 +24,33 @@ async function getBrowser() {
   }
 }
 
-
 async function discoverEndpointFromHtml(url: string): Promise<string | null> {
     const browser = await getBrowser();
-    console.log(browser)
     const page = await browser.newPage();
-    console.log(page)
+
+    // Listen for console logs from the page
+    page.on('console', (msg) => console.log('PAGE LOG:', msg.text()));
 
     try {
-        console.log("hej")
-      await page.goto(url);
-  
-      const oembedLink = await page.evaluate(() => {
-        const link = document.querySelector(
-          'link[rel="alternate"][type="application/json+oembed"], link[rel="alternate"][type="text/xml+oembed"]'
-        );
-        return link ? link.getAttribute('href') : null;
-      });
-  
-      return oembedLink;
+        console.log("Navigating to URL...");
+        await page.goto(url);
+
+        const oembedLink = await page.evaluate(() => {
+            console.log("Inside browser context");
+            const link = document.querySelector(
+                'link[rel="alternate"][type="application/json+oembed"]'
+            );
+            return link ? link.getAttribute('href') : null;
+        });
+
+        return oembedLink;
     } catch (error) {
-      console.error('Error parsing HTML:', error);
-      return null;
+        console.error('Error parsing HTML:', error);
+        return null;
     } finally {
-      await browser.close();
+        await browser.close();
     }
-  }
+}
 
 async function discoverOembedData(url: string): Promise<OEmbedResponse> {
   try {
