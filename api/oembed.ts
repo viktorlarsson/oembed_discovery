@@ -28,15 +28,15 @@ async function discoverEndpointFromHtml(url: string): Promise<string | null> {
     const browser = await getBrowser();
     const page = await browser.newPage();
 
-    // Listen for console logs from the page
-    page.on('console', (msg) => console.log('PAGE LOG:', msg.text()));
-
     try {
         console.log("Navigating to URL...");
-        await page.goto(url);
+        await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 });
 
+        // Wait for the specific selector
+        await page.waitForSelector('link[rel="alternate"][type="application/json+oembed"]', { timeout: 5000 });
+
+        // Query the DOM for the link
         const oembedLink = await page.evaluate(() => {
-            console.log("Inside browser context");
             const link = document.querySelector(
                 'link[rel="alternate"][type="application/json+oembed"]'
             );
