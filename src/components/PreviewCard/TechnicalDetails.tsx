@@ -12,8 +12,8 @@ export function TechnicalDetails({ data }: TechnicalDetailsProps) {
       <div className="grid grid-cols-2 gap-2 text-sm text-gray-600">
         <div>Type: {data.type}</div>
         <div>Version: {data.version || 'N/A'}</div>
-        {data.width && <div>Width: {data.width}px</div>}
-        {data.height && <div>Height: {data.height}px</div>}
+        {data.width && <div>Width: {data.width}</div>}
+        {data.height && <div>Height: {data.height}</div>}
         {data.cache_age && <div>Cache Age: {data.cache_age}s</div>}
         <div>Raw Tags: {data.html ? 'Yes' : 'No'}</div>
       </div>
