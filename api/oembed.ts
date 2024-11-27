@@ -1,6 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import puppeteerCore from "puppeteer-core";
-import puppeteer from "puppeteer";
+import puppeteer from "puppeteer-core";
 import chromium from "@sparticuz/chromium";
 
 import fetch from 'node-fetch';
@@ -12,7 +11,7 @@ async function getBrowser() {
   if (process.env.VERCEL_ENV === "production") {
     const executablePath = await chromium.executablePath();
 
-    const browser = await puppeteerCore.launch({
+    const browser = await puppeteer.launch({
       args: chromium.args,
       defaultViewport: chromium.defaultViewport,
       executablePath,
