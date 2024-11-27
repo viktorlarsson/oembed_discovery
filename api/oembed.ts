@@ -23,33 +23,58 @@ async function getBrowser() {
     return browser;
   }
 }
-
 async function discoverEndpointFromHtml(url: string): Promise<string | null> {
-    const browser = await getBrowser();
+    const browser = await puppeteer.launch({
+        args: [
+            ...chromium.args,
+            "--no-sandbox",
+            "--disable-setuid-sandbox",
+            "--disable-dev-shm-usage",
+            "--disable-gpu",
+        ],
+        defaultViewport: chromium.defaultViewport,
+        executablePath: await chromium.executablePath(),
+        headless: chromium.headless,
+    });
+
     const page = await browser.newPage();
 
     try {
+        console.log("Setting up anti-detection measures...");
+        await page.setUserAgent(
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36"
+        );
+        await page.setViewport({
+            width: Math.floor(Math.random() * (1920 - 800) + 800),
+            height: Math.floor(Math.random() * (1080 - 600) + 600),
+        });
+        await page.setExtraHTTPHeaders({
+            "Accept-Language": "en-US,en;q=0.9",
+            Referer: "https://www.google.com",
+        });
+
         console.log("Navigating to URL...");
-        await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 });
+        await page.goto(url, { waitUntil: "domcontentloaded", timeout: 30000 });
 
-        // Dump the HTML to a log
+        // Dump the HTML content for debugging
         const html = await page.content();
-        console.log("PAGE HTML:", html);
+        console.log("PAGE HTML DUMP:", html);
 
-        // Wait for the specific selector
-        await page.waitForSelector('link[rel="alternate"][type="application/json+oembed"]', { timeout: 5000 });
-
-        // Query the DOM for the link
+        // Wait for and query the specific selector
+        await page.waitForSelector(
+            'link[rel="alternate"][type="application/json+oembed"]',
+            { timeout: 5000 }
+        );
         const oembedLink = await page.evaluate(() => {
             const link = document.querySelector(
                 'link[rel="alternate"][type="application/json+oembed"]'
             );
-            return link ? link.getAttribute('href') : null;
+            return link ? link.getAttribute("href") : null;
         });
 
         return oembedLink;
     } catch (error) {
-        console.log('Error parsing HTML:', error);
+        console.error("Error parsing HTML:", error);
         return null;
     } finally {
         await browser.close();
