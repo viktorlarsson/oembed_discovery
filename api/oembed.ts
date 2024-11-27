@@ -37,3 +37,4 @@ export default async function handler(
       .status(404)
       .json({ error: error instanceof Error ? error.message : 'No oEmbed data found' });
   }
+}
