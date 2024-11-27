@@ -26,7 +26,7 @@ async function discoverEndpointFromHtml(url: string): Promise<string | null> {
   }
 }
 
-export async function discoverOembedData(url: string): Promise<OEmbedResponse> {
+async function discoverOembedData(url: string): Promise<OEmbedResponse> {
   try {
     const oembedEndpoint = await discoverEndpointFromHtml(url);
 
