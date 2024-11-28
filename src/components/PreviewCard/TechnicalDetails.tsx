@@ -15,7 +15,8 @@ export function TechnicalDetails({ data }: TechnicalDetailsProps) {
         {data.width && <div>Width: {data.width}px</div>}
         {data.height && <div>Height: {data.height}px</div>}
         {data.cache_age && <div>Cache Age: {data.cache_age}s</div>}
-        <div>Raw Tags: {data.html ? 'Yes' : 'No'}</div>
+        {data.embedUrl && <div>Embed URL: {data.embedUrl}</div>}
+        {data.contentUrl && <div>Content URL: {data.contentUrl}</div>}
       </div>
       {data.html && (
         <div className="mt-4">
