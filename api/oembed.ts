@@ -7,22 +7,7 @@ import { JSDOM } from 'jsdom';
 import { OEmbedResponse } from '../src/types/oembed';
 
 
-async function getBrowser() {
-  if (process.env.VERCEL_ENV === "production") {
-    const executablePath = await chromium.executablePath();
 
-    const browser = await puppeteer.launch({
-      args: chromium.args,
-      defaultViewport: chromium.defaultViewport,
-      executablePath,
-      headless: chromium.headless,
-    });
-    return browser;
-  } else {
-    const browser = await puppeteer.launch();
-    return browser;
-  }
-}
 async function discoverEndpointFromHtml(url: string): Promise<string | null> {
     const browser = await puppeteer.launch({
         args: [
@@ -44,11 +29,12 @@ async function discoverEndpointFromHtml(url: string): Promise<string | null> {
         await page.setUserAgent(
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36"
         );
-        
+
         await page.setViewport({
             width: Math.floor(Math.random() * (1920 - 800) + 800),
             height: Math.floor(Math.random() * (1080 - 600) + 600),
         });
+
         await page.setExtraHTTPHeaders({
             "Accept-Language": "en-US,en;q=0.9",
             Referer: "https://www.google.com",
@@ -57,23 +43,76 @@ async function discoverEndpointFromHtml(url: string): Promise<string | null> {
         console.log("Navigating to URL...");
         await page.goto(url, { waitUntil: "domcontentloaded", timeout: 30000 });
 
-        // Dump the HTML content for debugging
         const html = await page.content();
         console.log("PAGE HTML DUMP:", html);
 
-        // Wait for and query the specific selector
-        await page.waitForSelector(
-            'link[rel="alternate"][type="application/json+oembed"]',
-            { timeout: 5000 }
-        );
+        // Attempt to find oEmbed links
         const oembedLink = await page.evaluate(() => {
-            const link = document.querySelector(
-                'link[rel="alternate"][type="application/json+oembed"]'
-            );
-            return link ? link.getAttribute("href") : null;
+            const selectors = [
+                'link[type="application/json+oembed"]',
+                'link[type="text/json+oembed"]',
+                'link[type="application/xml+oembed"]',
+                'link[type="text/xml+oembed"]',
+            ];
+            for (const selector of selectors) {
+                const link = document.querySelector(selector);
+                if (link?.getAttribute("href")) {
+                    return link.getAttribute("href");
+                }
+            }
+            return null;
         });
 
-        return oembedLink;
+        if (oembedLink) {
+            return oembedLink;
+        }
+
+        // Check for Open Graph video/audio providers
+        const mediaUrl = await page.evaluate(() => {
+            const ogVideo = document.querySelector('meta[property="og:video:url"]');
+            const ogAudio = document.querySelector('meta[property="og:audio:url"]');
+            return ogVideo?.getAttribute("content") || ogAudio?.getAttribute("content") || null;
+        });
+
+        if (mediaUrl) {
+            return constructOEmbedEndpoint(mediaUrl);
+        }
+
+        // Check for Twitter cards
+        const twitterPlayer = await page.evaluate(() => {
+            const twitterCard = document.querySelector('meta[name="twitter:card"]');
+            const twitterPlayer = document.querySelector('meta[name="twitter:player"]');
+            if (twitterCard && twitterPlayer) {
+                return twitterPlayer.getAttribute("content");
+            }
+            return null;
+        });
+
+        if (twitterPlayer) {
+            return constructOEmbedEndpoint(twitterPlayer);
+        }
+
+        // Check for schema.org VideoObject
+        const schemaData = await page.evaluate(() => {
+            const schemaScript = document.querySelector('script[type="application/ld+json"]');
+            if (schemaScript) {
+                try {
+                    const schema = JSON.parse(schemaScript.textContent || "");
+                    if (schema["@type"] === "VideoObject" && schema.embedUrl) {
+                        return schema.embedUrl;
+                    }
+                } catch (e) {
+                    console.error("Error parsing schema.org data:", e);
+                }
+            }
+            return null;
+        });
+
+        if (schemaData) {
+            return constructOEmbedEndpoint(schemaData);
+        }
+
+        return null;
     } catch (error) {
         console.error("Error parsing HTML:", error);
         return null;
