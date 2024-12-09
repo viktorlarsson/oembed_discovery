@@ -1,5 +1,5 @@
-import React from 'react';
-import { Search } from 'lucide-react';
+import React from "react";
+import { Search } from "lucide-react";
 
 interface URLInputProps {
   url: string;
@@ -15,7 +15,9 @@ export function URLInput({ url, onUrlChange, onSubmit }: URLInputProps) {
 
   return (
     <form onSubmit={handleSubmit} className="w-full max-w-3xl">
-      <label htmlFor="url-input" className="sr-only">Enter URL to test oEmbed discovery</label>
+      <label htmlFor="url-input" className="sr-only">
+        Enter URL to test oEmbed discovery
+      </label>
       <div className="relative">
         <input
           id="url-input"
@@ -36,7 +38,9 @@ export function URLInput({ url, onUrlChange, onSubmit }: URLInputProps) {
         </button>
       </div>
       <p className="mt-2 text-sm text-gray-500">
-        Try with YouTube videos, Vimeo links, Twitter posts, or any website that supports oEmbed
+        Try with Vimeo links, Soundcloud, or any website that supports oEmbed
+        and does not block scrapers in a more sofisticated manner (like
+        Youtube).
       </p>
     </form>
   );
